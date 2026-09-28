@@ -1,0 +1,92 @@
+Build Configuration (mc:):
+WRLINUX_VERSION      = "10.26.42.1"
+WRLINUX_BRANCH       = "LTS"
+BB_VERSION           = "2.18.0"
+BUILD_SYS            = "x86_64-linux"
+NATIVELSBSTRING      = "ubuntu-22.04"
+TARGET_SYS           = "x86_64-wrs-linux"
+MACHINE              = "qemux86-64"
+SDKMACHINE           = "x86_64"
+DISTRO               = "wrlinux"
+DISTRO_VERSION       = "10.26.42.1"
+TUNE_FEATURES        = "m64 x86-64-v3"
+DEFAULTTUNE          = "x86-64-v3"
+XILINX_RELEASE_VERSION = "v2026.1"
+lib32:  TARGET_SYS        = "i686-wrsmllib32-linux"
+lib32:  TUNE_FEATURES     = "m32 core2"
+lib32:  DEFAULTTUNE       = "core2-32"
+wrlinux              
+wrlinux-distro       = "WRLINUX_10_26_LTS:4e4a7a6ee540f8f4642f80d9e48b01f02392d5ac"
+meta                 = "WRLINUX_10_26_LTS:1849daf30bff96d796e3d0d2b62efca86038c846"
+meta-initramfs       
+meta-xfce            
+meta-oe              
+meta-filesystems     
+meta-webserver       
+meta-networking      
+meta-python          
+meta-perl            
+meta-gnome           
+meta-multimedia      = "HEAD:3a2e1f9649b2b13a4bef311ee17bb2ad1ac5fc19"
+meta-security        = "HEAD:e4ac2a5d09d680b162764772c5a40d8862cd4b28"
+meta-selinux         = "HEAD:7fee8dc49fbc2b374518677b6696d03da751ea69"
+intel-x86            = "HEAD:15693b2be3a8504cf0babf1b0cfc1b450bacd78a"
+meta-virtualization  = "HEAD:159b4559f493b9cbd10dc54d3de207ed6b826752"
+meta-mingw           = "HEAD:5946bbdcee95431ddd23cb288915fb5ec6ee385d"
+wr-template          = "HEAD:ae6ae791deab69d6027369be066fbf8325ecc8ba"
+meta-yocto-bsp       
+meta-poky            = "WRLINUX_10_26_LTS:bf791bd6fbcd0af21653c80fdcf3248cca7891ae"
+meta-efi-secure-boot 
+meta-encrypted-storage 
+meta-integrity       
+meta-signing-key     = "HEAD:39046a01747a59394b9ddc2fe5e6835038d731c3"
+meta-cloud-services  = "HEAD:92cc877fa6dbe73ba796b8ce7e10fc6dba6a5a27"
+bcm-2xxx-rpi         = "HEAD:f5e550bc6088f79e7aea780d52e6e41514625ed8"
+meta-secure-core-common 
+meta-ids             
+meta-tpm2            = "HEAD:39046a01747a59394b9ddc2fe5e6835038d731c3"
+meta-intel           = "HEAD:a22f5ac33bfd9f20a47ec3e2ea65db5759a0af3a"
+meta-dpdk            = "HEAD:ac5de2be1ec766255438c9a73b14b5978265c197"
+meta-intel-qat       = "HEAD:0f807eaa938de4b791a12f3f67a289c3fab4b6d7"
+meta-freescale       = "WRLINUX_10_26_LTS:2b2780a0288069c2c1edc4c220551007c98f082f"
+meta-anaconda        = "HEAD:7cf768009c398e825f2dea2048acd9f57702f23b"
+meta-tensorflow      = "HEAD:3d48d19772134239b1c76af0e2e1f60a3f824c1d"
+meta-clang           = "HEAD:ef0d22f21910a0c30c967eeb17d8f209806e2d81"
+meta-raspberrypi     = "HEAD:f3fd00ff9001566d5a9557194ff2a1b29f456f3b"
+wr-sbom              = "HEAD:010b15f8eb165b529d15c214ee154221d9a91ec8"
+meta-xilinx-standalone 
+meta-xilinx-core     
+meta-xilinx-bsp      
+meta-microblaze      = "HEAD:bdd17304edf8cc26644d56beafd225ea50c235e8"
+meta-freescale-distro = "WRLINUX_10_26_LTS:6544049b136090d8633d032e7464f5ffb33294a4"
+meta-arm             = "HEAD:9dab8bdd4991973faa6dfc5b3c607f4c09cc1cdb"
+meta-qt6             = "HEAD:852d9e36eafdf14135f33d482032aa0f9d4b43f1"
+wr-kernel-dev        = "HEAD:35c4e94d7a1dfeee3f3897b333fd7372c8688560"
+meta-aws             = "HEAD:0845d84fbfa355af70975ca6d7a86b5c6ffd94aa"
+nxp-imx9             = "HEAD:05dc3748ffa239212c54a98dafda7476a294b79b"
+meta-imx-ml          
+meta-imx-sdk         
+meta-imx-bsp         = "WRLINUX_10_26_LTS:fd4422163cdd5158f9f66db0f2c4ae520f8c0e71"
+amd-zynqmp           = "HEAD:a792bf9a51aa8e023d9673bd9c993dfa649efa94"
+amd-zynq             = "HEAD:eb3d5ea6c9e4a64c12deac3d4cd3be311b80d004"
+meta-tegra           = "HEAD:298d6949937feabec5d9ce1d8c922994ff2cf9ef"
+nvidia-orin          = "HEAD:e25d16150fd1661b4626aed194e3e56382a585c8"
+meta-xilinx-mali400  = "HEAD:bdd17304edf8cc26644d56beafd225ea50c235e8"
+meta-openvino        = "HEAD:b4216f38ec47d9b9f26a99b623a6fbc73904b377"
+meta-arm-toolchain   = "HEAD:9dab8bdd4991973faa6dfc5b3c607f4c09cc1cdb"
+meta-tegra-community = "HEAD:c118b70a3559b00ea86d3b9066ee3de07215d554"
+meta-xilinx-standalone-sdt = "HEAD:bdd17304edf8cc26644d56beafd225ea50c235e8"
+meta-footprint       = "HEAD:730409d2e81bcd59810dedece50a0a6650c3b4bc"
+meta-xilinx-multimedia = "HEAD:bdd17304edf8cc26644d56beafd225ea50c235e8"
+meta-amd-adaptive-socs-bsp = "HEAD:609ec6fc154ef02329f0a4fcd8c56255c88719a7"
+wr-llm               = "HEAD:13960aba2de009427d574bed453e9ab240241a6a"
+meta-freescale-ml    = "HEAD:8c4f628daa58493dd2d2f51997f520a87d8d7f85"
+meta-xilinx-gpu-malig78ae 
+meta-xilinx-demos    
+meta-xilinx-imgrcvry = "HEAD:bdd17304edf8cc26644d56beafd225ea50c235e8"
+meta-clang-revival   = "HEAD:fd04dd00917b2bdf77fd08a349c346e3ca66de4e"
+meta-mchp-common     
+meta-mchp-pic64      = "HEAD:a918676e6393fe308b4dd2bafc43749226a52cc0"
+microchip-pic64gx    = "HEAD:6899c1facf3e9877b0033b1931a9c8c0f307dc0d"
+wrlinux-src-dl       = "HEAD:564245e617df57a7fdad800f06254bd9be14c944"
+local                = "master:0833386a0794853aacf4d3a490120af0f8969c4d"

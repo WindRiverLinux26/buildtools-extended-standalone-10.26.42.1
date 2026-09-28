@@ -1,0 +1,166 @@
+Prebuilt build tools
+====================
+
+The buildtools in this directory are used to provide specific versions of
+software to aid in the setup and use of a Wind River Linux project.
+
+To make the use of the buildtools, the binaries are automatically
+installed by setup and made available in the project as a script to be
+sourced called: environment-setup-x86_64-wrlinuxsdk-linux
+
+
+Maintenance
+-----------
+This directory is maintained by Wind River Systems, Inc.
+Contact <support@windriver.com> or your support representative for more
+information on submitting changes.
+
+
+Rebuilding of prebuilts
+-----------------------
+
+Current prebuilt build tools is based on Wind River Linux LTS25.
+
+To get started with Wind River Linux LTS25 latest branch WRLINUX_10_25_LTS
+
+$ git clone --branch WRLINUX_10_25_LTS https://github.com/WindRiverLinux25/wrlinux-x
+
+
+Setup a new project, using --machine=qemux86-64
+
+$ wrlinux-x/setup.sh --machines qemux86-64
+
+
+Create a new build directory using oe-init-build-env
+
+$ source oe-init-build-env
+
+Multiarch Configuration, support to use 64-bit nativesdk-gcc to build 32-bit application
+
+$ cat >>conf/local.conf <<EOF
+BBMULTICONFIG = "x86 x86_64"
+# Unify the same SDKPATHNATIVE for two multiconfig, otherwise
+# nativesdk relocation will fail
+SDKPATHNATIVE = "\${SDKPATH}/sysroots/x86_64\${SDK_VENDOR}-\${SDK_OS}"
+DISTRO_FEATURES_NATIVESDK:append = " multiarch"
+EOF
+
+
+$ mkdir -p conf/multiconfig
+
+$ cat > conf/multiconfig/x86.conf <<EOF
+SDKMACHINE = "i686"
+TMPDIR = "\${TOPDIR}/tmp-mc-x86"
+# Only install 32bit toolchains library and include files to buildtools-tarball
+TOOLCHAIN_HOST_TASK:pn-buildtools-tarball = "nativesdk-libgcc nativesdk-libgcc-dev nativesdk-glibc nativesdk-glibc-dev nativesdk-sdk-provides-dummy nativesdk-buildtools-perl-dummy"
+
+TOOLCHAIN_HOST_TASK:remove = "nativesdk-python3-jinja2"
+TOOLCHAIN_HOST_TASK:remove = "nativesdk-openssh-ssh"
+TOOLCHAIN_HOST_TASK:remove = "nativesdk-anspass"
+# Do not add relocate script to buildtools-tarball
+SDK_RELOCATE_AFTER_INSTALL:pn-buildtools-tarball = "0"
+EOF
+
+$ cat > conf/multiconfig/x86_64.conf <<EOF
+SDKMACHINE = "x86_64"
+TMPDIR = "\${TOPDIR}/tmp-mc-x86_64"
+TOOLCHAIN_HOST_TASK:append:pn-buildtools-extended-tarball = " nativesdk-multiconfig-multlib-toolchain-packager-x86"
+# lib64 in 64bit nativesdk sysroot, avoid conflict with 32bit lib
+baselib:class-nativesdk= "lib64"
+baselib:class-crosssdk= "lib64"
+libdir_nativesdk = "\${prefix_nativesdk}/lib64"
+base_libdir_nativesdk = "/lib64"
+EOF
+
+Build buildtools tarballs
+
+$ bitbake mc:x86_64:buildtools-extended-tarball &>build-extended.log
+
+
+The generated buildtools files reside in tmp-mc-x86_64/deploy/sdk accordingly
+
+<sdkmachine>-buildtools-extended-nativesdk-standalone-<version>.sh
+
+SDK manifest files are
+
+<sdkmachine>-buildtools-extended-nativesdk-standalone-<version>.host.manifest
+
+
+And use following command to get the sources:
+
+$ bitbake mc:x86_64:buildtools-extended-tarball --runall=fetch
+
+the sources will be downloaded to ${DL_DIR}.
+
+
+Then construct buildtools git repo, take buildtools-extended-tarball as example
+
+$ BUILDTOOLS=buildtools-extended
+$ ORIG_VERSION=10.25.17.0
+$ VERSION=10.25.17.0
+$ LOGFILE=build-extended.log
+$ BUILDTOOLS_DIR=$BUILDTOOLS-standalone-$VERSION
+$ mkdir $BUILDTOOLS_DIR
+
+Save the build configuration to file config
+
+$ sed -n '/^Build Configuration:/,/^local /p' $LOGFILE >$BUILDTOOLS_DIR/config
+
+Copy the buildtools manifest file
+
+$ cp tmp-mc-x86_64/deploy/sdk/x86_64-$BUILDTOOLS-nativesdk-standalone-$ORIG_VERSION.host.manifest \
+     $BUILDTOOLS_DIR/x86_64-$BUILDTOOLS-nativesdk-standalone-$VERSION.host.manifest
+
+
+Backup license files of packages
+
+$ mkdir $BUILDTOOLS_DIR/licenses
+$ while read name arch version; do
+    srpm=$(rpm -qp --queryformat '%{SOURCERPM}\n' tmp-mc-x86_64/deploy/rpm/$arch/$name-$version*$arch.rpm)
+    srpm_name=${srpm%%-${version}*}
+
+    if [ -d tmp-mc-x86_64/deploy/licenses/$srpm_name ]; then
+        if [ ! -d $BUILDTOOLS_DIR/licenses/$srpm_name ]; then
+            cp -r tmp-mc-x86_64/deploy/licenses/$srpm_name $BUILDTOOLS_DIR/licenses/
+        fi
+        if [ ${srpm_name} != ${name} ]; then
+            ln -s $srpm_name $BUILDTOOLS_DIR/licenses/$name
+        fi
+    fi
+done < $BUILDTOOLS_DIR/x86_64-$BUILDTOOLS-nativesdk-standalone-$VERSION.host.manifest
+
+
+The last step is to copy the buildtools file itself.
+
+Since git has a hard threshold that it doesn't accept one file larger than
+100M, we set a soft threshold 50M in WRLinux. Check the buildtools file and
+split it if the size is larger than the threshold, and save files list to a
+.list file with same base name of the buildtools file.
+
+$ bt_file=tmp-mc-x86_64/deploy/sdk/x86_64-$BUILDTOOLS-nativesdk-standalone-$ORIG_VERSION.sh
+$ bt_basename=x86_64-$BUILDTOOLS-nativesdk-standalone-$VERSION
+$ bt_size=$(du -m $bt_file | cut -f1)
+$ if [ 50 -lt "$bt_size" ]; then
+    split -b 50M --numeric-suffixes=1 \
+    $bt_file \
+    $BUILDTOOLS_DIR/x86_64-$BUILDTOOLS-nativesdk-standalone-$VERSION.part
+    for part in $BUILDTOOLS_DIR/*part*; do
+        echo ${part##*/} >>$BUILDTOOLS_DIR/$bt_basename.list
+    done
+else
+    cp $bt_file $BUILDTOOLS_DIR/$bt_basename.sh
+fi
+
+For the split buildtools file, use command cat to restore it:
+
+$ cd $BUILDTOOLS_DIR
+$ cat $(cat x86_64-$BUILDTOOLS-nativesdk-standalone-$VERSION.list) \
+      >> x86_64-$BUILDTOOLS-nativesdk-standalone-$VERSION.sh
+$ chmod +x x86_64-$BUILDTOOLS-nativesdk-standalone-$VERSION.sh
+
+
+License
+-------
+
+For license information on components included in the archive, see the
+corresponding nativesdk recipe and source code.
